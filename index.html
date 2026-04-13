@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Top Controls -->
+    <div id="top-controls">
+        <button id="saveBtn" class="action-btn">Save Tier List</button>
+        <button id="loadBtn" class="action-btn">Open Tier List</button>
+    </div>
+
+    <!-- Tier Container -->
+    <div id="tier-container">
+        <div class="tier-row" id="S">
+            <div class="label" style="background-color: #ffbf7f;">S</div>
+            <div class="drop-zone"></div>
+        </div>
+        <div class="tier-row" id="A">
+            <div class="label" style="background-color: #90EE90;">A</div>
+            <div class="drop-zone"></div>
+        </div>
+        <div class="tier-row" id="B">
+            <div class="label" style="background-color: #32CD32;">B</div>
+            <div class="drop-zone"></div>
+        </div>
+        <div class="tier-row" id="C">
+            <div class="label" style="background-color: #006400;">C</div>
+            <div class="drop-zone"></div>
+        </div>
+        <div class="tier-row" id="D">
+            <div class="label" style="background-color: #FFA500;">D</div>
+            <div class="drop-zone"></div>
+        </div>
+        <div class="tier-row" id="F">
+            <div class="label" style="background-color: #FF0000;">F</div>
+            <div class="drop-zone"></div>
+        </div>
+    </div>
+
+    <!-- Bench Area -->
+    <div id="bench">
+        <button id="addImagesBtn" class="custom-file-upload">Add Images</button>
+        <div id="bench-items" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>

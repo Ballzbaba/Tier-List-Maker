@@ -1,0 +1,11 @@
+# Ignore PyInstaller build folders
+dist/
+build/
+*.spec
+
+# Ignore Python cache
+__pycache__/
+
+# Ignore your local saved tier lists (so you don't upload your personal lists)
+*.tier
+tier_list_save.json
