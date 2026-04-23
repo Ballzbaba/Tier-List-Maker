@@ -53,7 +53,8 @@ function getState() {
     
     for (const wrapper of wrappers) {
         const img = wrapper.querySelector('img');
-        const item = { src: img.src, id: wrapper.id };
+        const note = wrapper.getAttribute('data-note') || "";
+        const item = { src: img.src, id: wrapper.id, note: note };
         
         const container = wrapper.parentElement;
         if (!container) continue;
@@ -80,12 +81,12 @@ function loadState(data) {
             const row = document.getElementById(tierId);
             if (row) {
                 const dropZone = row.querySelector('.drop-zone');
-                items.forEach(item => createTierImage(item.src, item.id, dropZone, true));
+                items.forEach(item => createTierImage(item.src, item.id, dropZone, true, item.note));
             }
         });
     }
     if (data.bench) {
-        data.bench.forEach(item => createTierImage(item.src, item.id, document.getElementById('bench-items'), true));
+        data.bench.forEach(item => createTierImage(item.src, item.id, document.getElementById('bench-items'), true, item.note));
     }
     updateBenchState(true);
     clearDirty();
@@ -116,6 +117,9 @@ function openPreview(imgElement) {
     if (state.isDragging || state.isPreviewOpen) return;
     state.isPreviewOpen = true;
 
+    const wrapper = imgElement.parentElement;
+    const currentNote = wrapper.getAttribute('data-note') || "";
+
     const rect = imgElement.getBoundingClientRect();
     const overlay = document.createElement('div');
     overlay.id = 'preview-overlay';
@@ -127,6 +131,27 @@ function openPreview(imgElement) {
     const closeBtn = document.createElement('div');
     closeBtn.className = 'preview-close-btn';
     closeBtn.innerText = '×';
+
+    // Note Container in Preview
+    const noteContainer = document.createElement('div');
+    noteContainer.className = 'preview-note-container';
+    
+    const noteBox = document.createElement('div');
+    noteBox.className = 'preview-note-box';
+    
+    const noteInput = document.createElement('input');
+    noteInput.className = 'note-input';
+    noteInput.value = currentNote;
+    noteInput.placeholder = 'Add a note...';
+    
+    noteInput.onclick = (e) => e.stopPropagation();
+    noteInput.oninput = (e) => {
+        wrapper.setAttribute('data-note', e.target.value);
+        markDirty();
+    };
+    
+    noteBox.appendChild(noteInput);
+    noteContainer.appendChild(noteBox);
     
     Object.assign(previewImg.style, {
         top: rect.top + 'px',
@@ -136,19 +161,20 @@ function openPreview(imgElement) {
         transform: 'none'
     });
 
-    overlay.append(previewImg, closeBtn);
+    overlay.append(previewImg, closeBtn, noteContainer);
     document.body.appendChild(overlay);
 
     previewImg.offsetHeight;
 
     requestAnimationFrame(() => {
         overlay.classList.add('active');
+        noteContainer.classList.add('active');
         previewImg.style.top = '50%';
         previewImg.style.left = '50%';
         
         const naturalRatio = imgElement.naturalWidth / imgElement.naturalHeight;
         const maxWidth = window.innerWidth * 0.9;
-        const maxHeight = window.innerHeight * 0.9;
+        const maxHeight = window.innerHeight * 0.8; // Leave room for note
         let targetWidth, targetHeight;
         if (naturalRatio > maxWidth / maxHeight) {
             targetWidth = maxWidth; targetHeight = maxWidth / naturalRatio;
@@ -163,6 +189,7 @@ function openPreview(imgElement) {
 
     const close = () => {
         overlay.classList.remove('active');
+        noteContainer.classList.remove('active');
         const currentRect = imgElement.getBoundingClientRect();
         previewImg.style.top = currentRect.top + 'px';
         previewImg.style.left = currentRect.left + 'px';
@@ -177,10 +204,11 @@ function openPreview(imgElement) {
 }
 
 // Image Management
-function createTierImage(src, id, targetNode, immediate = false) {
+function createTierImage(src, id, targetNode, immediate = false, note = "") {
     if (!src) return;
     const wrapper = document.createElement('div');
     wrapper.className = 'tier-item-wrapper';
+    wrapper.setAttribute('data-note', note);
     
     let finalId = id || (Date.now() + '_' + Math.random());
     if (!finalId.toString().startsWith('wrap_')) finalId = 'wrap_' + finalId;
